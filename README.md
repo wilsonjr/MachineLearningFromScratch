@@ -1,2 +1,1 @@
-# MachineLearningFromScratch
-Implementation of a few machine learning algorithms. From the ebook by Daniel Friedman.
+This is a repository for learning concepts and implementing things from scratch.
