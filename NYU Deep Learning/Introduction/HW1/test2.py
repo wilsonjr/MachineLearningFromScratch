@@ -48,3 +48,7 @@ print((net_autograd.linear1.bias.grad.data - net.grads['dJdb1']).norm() < 1e-3)
 print((net_autograd.linear2.weight.grad.data - net.grads['dJdW2']).norm() < 1e-3)
 print((net_autograd.linear2.bias.grad.data - net.grads['dJdb2']).norm()< 1e-3)
 #------------------------------------------------
+print((net_autograd.linear1.weight.grad.data - net.grads['dJdW1']).norm() )
+print((net_autograd.linear1.bias.grad.data - net.grads['dJdb1']).norm() )
+print((net_autograd.linear2.weight.grad.data - net.grads['dJdW2']).norm() )
+print((net_autograd.linear2.bias.grad.data - net.grads['dJdb2']).norm())
