@@ -47,6 +47,15 @@ class MLP:
         else:
             return value
 
+    def d_activation(self, function, input, output):
+
+        if function == "relu":
+            return (input > 0).type(int)
+        elif function == "sigmoid":
+            return output * (1-output)
+        else:
+            return torch.ones(input.shape[0])
+
 
     def forward(self, x):
         """
@@ -54,14 +63,25 @@ class MLP:
             x: tensor shape (batch_size, linear_1_in_features)
         """
        
-        z0 = torch.transpose(x, 0, 1)
-        s1 = torch.mm(self.parameters['W1'], z0) + self.parameters['b1'][:, None]
-        z1 = self.activation(self.f_function, s1)
+        # z0 = torch.transpose(x, 0, 1)
+        # s1 = torch.mm(self.parameters['W1'], z0) + self.parameters['b1'][:, None]
+        # z1 = self.activation(self.f_function, s1)
         
-        s2 = torch.mm(self.parameters['W2'], z1) + self.parameters['b2'][:, None]
-        z2 = self.activation(self.g_function, s2)
+        # s2 = torch.mm(self.parameters['W2'], z1) + self.parameters['b2'][:, None]
 
-        return z2
+        z1 = torch.mm(x, self.parameters['W1'].T) + self.parameters['b1']
+        z2 = self.activation(self.f_function, z1)
+
+        z3 = torch.mm(z2, self.parameters['W2'].T) + self.parameters['b2']
+        yhat = self.activation(self.g_function, z3)
+
+        self.cache["X"] = x
+        self.cache["z1"] = z1 
+        self.cache["z2"] = z2 
+        self.cache["z3"] = z3 
+        self.cache["yhat"] = yhat
+
+        return yhat
 
     
     def backward(self, dJdy_hat):
@@ -69,8 +89,13 @@ class MLP:
         Args:
             dJdy_hat: The gradient tensor of shape (batch_size, linear_2_out_features)
         """
-        # TODO: Implement the backward function
-        pass
+        
+        dyhat_dz3 = self.d_activation(self.cache['z3'], self.cache['yhat'])
+
+        dJ_dz3 = dJdy_hat * dyhat_dz3
+        dJ_dW2 = dJ_dz3 * self.cache["z2"]
+
+
 
     
     def clear_grad_and_cache(self):
@@ -88,11 +113,10 @@ def mse_loss(y, y_hat):
         J: scalar of loss
         dJdy_hat: The gradient tensor of shape (batch_size, linear_2_out_features)
     """
-    # TODO: Implement the mse loss
-    pass
+    loss = torch.pow(y-y_hat, 2.0) / y.shape[0]
+    dJdy_hat = (2.0 * (y_hat - y)) / y.shape[0]
 
-
-    # return loss, dJdy_hat
+    return loss, dJdy_hat
 
 def bce_loss(y, y_hat):
     """
@@ -104,10 +128,10 @@ def bce_loss(y, y_hat):
         loss: scalar of loss
         dJdy_hat: The gradient tensor of shape (batch_size, linear_2_out_features)
     """
-    # TODO: Implement the bce loss
-    pass
+    loss = -torch.sum(y * torch.log(y_hat) - (1-y) * torch.log(1-y_hat))
+    dJdy_hat = -y/y_hat + (1.0-y)/(1.0-y_hat)
 
-    # return loss, dJdy_hat
+    return loss, dJdy_hat
 
 
 
