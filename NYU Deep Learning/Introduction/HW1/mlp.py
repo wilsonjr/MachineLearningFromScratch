@@ -62,18 +62,30 @@ class MLP:
         Args:
             x: tensor shape (batch_size, linear_1_in_features)
         """
-       
-        # z0 = torch.transpose(x, 0, 1)
-        # s1 = torch.mm(self.parameters['W1'], z0) + self.parameters['b1'][:, None]
-        # z1 = self.activation(self.f_function, s1)
-        
-        # s2 = torch.mm(self.parameters['W2'], z1) + self.parameters['b2'][:, None]
+
+        print("x.shape")
+        print(x.shape)
 
         z1 = torch.mm(x, self.parameters['W1'].T) + self.parameters['b1']
+
+        print("z1.shape")
+        print(z1.shape)
+        
         z2 = self.activation(self.f_function, z1)
 
+        print("z2.shape")
+        print(z2.shape)
+
         z3 = torch.mm(z2, self.parameters['W2'].T) + self.parameters['b2']
+
+        print("z3.shape")
+        print(z3.shape)
+
+
         yhat = self.activation(self.g_function, z3)
+
+        print("yhat.shape")
+        print(yhat.shape)
 
         self.cache["X"] = x
         self.cache["z1"] = z1 
@@ -178,9 +190,10 @@ if __name__ == '__main__':
     net.clear_grad_and_cache()
     y_hat = net.forward(x)
     J, dJdy_hat = mse_loss(y, y_hat)
-    print(y_hat)
-    print(J)
-    print(dJdy_hat)
+    # print(y_hat)
+    # print(J)
+    # print(dJdy_hat)
+    print("---------------------------------")
     net.backward(dJdy_hat)
 
 
